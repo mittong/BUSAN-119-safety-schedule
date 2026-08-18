@@ -249,97 +249,66 @@
             margin: 0;
         }
 
-        /* 시간표 네모칸 그대로 확대 팝업 스타일 */
-        .cell-zoom-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(2px);
-        }
-        .cell-zoom-overlay.active {
-            display: flex !important;
-            animation: fadeIn 0.15s ease-out;
-        }
-        .cell-zoom-card {
-            width: 90%;
-            max-width: 320px;
-            padding: 22px 18px;
-            border-radius: 18px;
-            border: 3px solid rgba(0, 0, 0, 0.2);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            animation: zoomInCell 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.25);
-            transition: transform 0.2s;
-        }
-        @keyframes zoomInCell {
-            0% { transform: scale(0.4); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .cell-zoom-badge-header {
-            font-size: 13px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.12);
-            color: #111;
-            padding: 4px 12px;
-            border-radius: 12px;
-            margin-bottom: 4px;
-        }
-        .cell-zoom-inst {
-            font-size: 22px;
-            font-weight: bold;
-            color: #111;
-        }
-        .cell-zoom-sprout {
-            font-size: 12px;
-            color: #1b5e20;
-            background: #e8f5e9;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .cell-zoom-group {
-            font-size: 18px;
-            font-weight: bold;
-            color: #111;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1.5px solid rgba(0, 0, 0, 0.2);
-            padding: 10px 14px;
-            border-radius: 10px;
-            width: 90%;
-            word-break: break-all;
-            line-height: 1.4;
-            margin: 4px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-        }
-        .cell-zoom-count {
-            font-size: 16px;
-            font-weight: bold;
-            color: #222;
-        }
-        .cell-zoom-dismiss-hint {
-            font-size: 11px;
-            color: rgba(0, 0, 0, 0.55);
-            margin-top: 6px;
-            font-weight: normal;
-        }
-
-        /* 시간표 셀 터치 반응형 및 돋보기 힌트 스타일 */
+        /* 시간표 표 안의 세로 칸(셀) 인라인 확대/펼침 (In-Table Cell Expansion) */
         table.schedule-table td.schedule-cell-clickable {
             cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: all 0.2s ease-in-out;
+            vertical-align: top;
+            position: relative;
         }
-        table.schedule-table td.schedule-cell-clickable:active {
-            transform: scale(0.96);
+
+        /* 기본 상태: 단체명이 길면 1줄 말줄임(...)으로 깔끔하게 유지 */
+        table.schedule-table td .editable-group {
+            width: 95%;
+            padding: 2px 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #111;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        /* 터치하여 확장(cell-expanded)된 셀: 해당 세로 칸(셀) 자체가 쫘악 늘어나며 풀 단체명이 전체 표시됨 */
+        table.schedule-table td.cell-expanded {
+            padding: 10px 4px !important;
+            box-shadow: inset 0 0 0 2.5px #d32f2f, 0 4px 12px rgba(211,47,47,0.25) !important;
+            z-index: 10;
+        }
+
+        table.schedule-table td.cell-expanded .editable-group {
+            white-space: normal !important;
+            word-break: break-all !important;
+            font-size: 12.5px !important;
+            line-height: 1.4 !important;
+            padding: 6px 4px !important;
+            background: #ffffff !important;
+            border-color: #d32f2f !important;
+            color: #d32f2f !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+        }
+
+        /* 어플 모드 읽기전용 시 기본 및 확장 스타일 */
+        body.app-mode table.schedule-table td .editable-group {
+            border: none !important;
+            background: transparent !important;
+            pointer-events: none !important;
+        }
+
+        body.app-mode table.schedule-table td.cell-expanded .editable-group {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1.5px solid #d32f2f !important;
+            border-radius: 6px !important;
         }
     </style>
     <style>
@@ -478,17 +447,7 @@
         <span id="syncStatusBadgeApp" class="info-badge" style="background:rgba(255,255,255,0.9); color:#111; font-weight:bold; font-size:11px;">🟢 연결됨</span>
     </div>
 
-    <!-- 네모칸 그대로 확대 팝업 모달 -->
-    <div id="cellDetailModal" class="cell-zoom-overlay" onclick="closeCellDetailModal(event)">
-        <div class="cell-zoom-card" id="zoomCardBox" onclick="closeCellDetailModal(event)">
-            <div class="cell-zoom-badge-header" id="zoomHeaderCourse">📌 1교시 - 도시재난</div>
-            <div class="cell-zoom-inst" id="zoomInst">홍길동</div>
-            <div class="cell-zoom-sprout" id="zoomSprout" style="display:none;">🕐 10:00 시작</div>
-            <div class="cell-zoom-group" id="zoomGroup">부산 해운대초등학교 3학년 2반</div>
-            <div class="cell-zoom-count" id="zoomCount">25명</div>
-            <div class="cell-zoom-dismiss-hint">💡 다시 터치하면 원래 크기로 줄어듭니다</div>
-        </div>
-    </div>
+
 
     <!-- 탭 내비게이션 -->
     <div class="tab-menu">
@@ -2481,49 +2440,17 @@ function updateSyncStatusBadge(state) {
     }
 }
 
-function openCellDetailModal(pIdx, cIdx) {
-    if (!lastGeneratedSchedule || !lastGeneratedSchedule[pIdx] || !lastGeneratedSchedule[pIdx][cIdx]) return;
-    const cellData = lastGeneratedSchedule[pIdx][cIdx];
-    const period = standardPeriods[pIdx];
-    const course = courses[cIdx];
-    if (!cellData || !period || !course) return;
-
-    const modal = document.getElementById('cellDetailModal');
-    const zoomCard = document.getElementById('zoomCardBox');
-    if (!modal || !zoomCard) return;
-
-    const instName = cellData.instructor || "미배정";
-    const groupName = cellData.group ? cellData.group.trim() : "개인 / 단체 없음";
-    const countVal = (cellData.count !== undefined ? cellData.count : 0) + "명";
-    const isCanceled = !!cellData.canceled;
-
-    document.getElementById('zoomHeaderCourse').innerText = `📌 ${period.name} (${period.timeStr}) - ${course.name}`;
-    document.getElementById('zoomInst').innerText = instName + (isCanceled ? " 🚫 [수업 취소됨]" : "");
-    document.getElementById('zoomGroup').innerText = groupName;
-    document.getElementById('zoomCount').innerText = countVal;
-
-    const groupColor = isCanceled ? '#f5f5f5' : getGroupColor(cellData.group);
-    zoomCard.style.backgroundColor = (groupColor && groupColor !== 'transparent') ? groupColor : '#ffffff';
-    if (isCanceled) {
-        zoomCard.style.border = '3px dashed #e53935';
+function toggleCellExpand(tdEl) {
+    if (!tdEl) return;
+    const isExpanded = tdEl.classList.contains('cell-expanded');
+    document.querySelectorAll('table.schedule-table td.cell-expanded').forEach(el => {
+        if (el !== tdEl) el.classList.remove('cell-expanded');
+    });
+    if (isExpanded) {
+        tdEl.classList.remove('cell-expanded');
     } else {
-        zoomCard.style.border = '3px solid rgba(0,0,0,0.2)';
+        tdEl.classList.add('cell-expanded');
     }
-
-    const sproutEl = document.getElementById('zoomSprout');
-    if (cellData.sproutTime && sproutEl) {
-        sproutEl.style.display = 'inline-block';
-        sproutEl.innerText = `🕐 ${cellData.sproutTime} 시작`;
-    } else if (sproutEl) {
-        sproutEl.style.display = 'none';
-    }
-
-    modal.classList.add('active');
-}
-
-function closeCellDetailModal(event) {
-    const modal = document.getElementById('cellDetailModal');
-    if (modal) modal.classList.remove('active');
 }
 
 function initAppDisplayMode() {
@@ -4556,7 +4483,7 @@ function renderScheduleTable(scheduleMap) {
                 let cancelBtnText = isCanceled ? '복구' : '취소';
                 let cancelBtnStyle = isCanceled ? 'background:#e0e0e0; color:#333;' : 'background:#ffebee; color:#c62828;';
 
-                html += `<td class="schedule-cell-clickable" onclick="openCellDetailModal(${pIdx}, ${cIdx})" title="${groupNameVal ? '🏢 ' + groupNameVal + ' (터치시 확대)' : '터치시 상세보기'}" style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
+                html += `<td class="schedule-cell-clickable" onclick="toggleCellExpand(this)" title="터치시 세로 칸 확장 및 풀 단체명 펼치기" style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
                     ${isCanceled ? '<div style="font-size:10px; color:#c62828; font-weight:bold; margin-bottom:2px;">🚫 [수업 취소됨]</div>' : ''}
                     <input type="text" class="editable-inst" value="${instName}" style="${style}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
                     ${cellData.sproutTime ? `<div class="cell-group-tag mobile-hide-btn" style="background:#e8f5e9; color:#1b5e20; ${isCanceled ? 'opacity:0.5;' : ''}">🕐 ${cellData.sproutTime}</div>` : ''}
