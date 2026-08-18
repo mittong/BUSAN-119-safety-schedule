@@ -169,6 +169,85 @@
             gap: 4px;
             font-weight: bold;
         }
+
+        /* ====================================================
+           [어플 모드(.apk) 전용: 읽기 전용(Read-Only) & 간결화]
+           ==================================================== */
+        
+        /* 어플 모드에서는 1번(일일시간표), 3번(월간결산) 탭만 표출, 2/4/5번 탭 숨김 */
+        body.app-mode .tab-menu button[onclick*="tab2"],
+        body.app-mode .tab-menu button[onclick*="tab4"],
+        body.app-mode .tab-menu button[onclick*="tab5"] {
+            display: none !important;
+        }
+
+        /* 어플 모드에서는 탭 내비게이션 버튼 1번과 3번이 화면 너비를 공평하게 반씩 차지하도록 설정 */
+        body.app-mode .tab-menu button[onclick*="tab1"],
+        body.app-mode .tab-menu button[onclick*="tab3"] {
+            flex: 1 1 50% !important;
+            min-width: 0 !important;
+            font-size: 13.5px !important;
+            padding: 10px 4px !important;
+            text-align: center !important;
+        }
+
+        /* 어플 모드 읽기 전용 (수정 불가능) 설정: 설정 패널 및 저장/편집 버튼 숨김 */
+        body.app-mode #mobileSettingArea,
+        body.app-mode .mobile-toggle-btn,
+        body.app-mode .btn-save,
+        body.app-mode .btn-reset,
+        body.app-mode .btn-excel,
+        body.app-mode .btn-excel2,
+        body.app-mode .mobile-hide-btn,
+        body.app-mode #result .btn-save,
+        body.app-mode #result .btn-reset,
+        body.app-mode #result button:not(.tab-btn),
+        body.app-mode #tab3 button:not(.tab-btn) {
+            display: none !important;
+        }
+
+        body.app-mode .app-readonly-badge {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #bbdefb;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* 어플 모드에서 시간표 셀 안의 텍스트가 수정 불가능하도록 깔끔한 Plain Text화 */
+        body.app-mode .editable-inst,
+        body.app-mode .editable-group,
+        body.app-mode .editable-count,
+        body.app-mode .stat-num-input {
+            border: none !important;
+            background: transparent !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            cursor: default !important;
+            color: #111 !important;
+            font-weight: bold !important;
+        }
+
+        body.app-mode input[type="number"].editable-count {
+            -moz-appearance: textfield;
+            width: auto !important;
+        }
+
+        body.app-mode input[type="number"].editable-count::-webkit-inner-spin-button,
+        body.app-mode input[type="number"].editable-count::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
     <style>
         .seomu-user { background-color: #e3f2fd; }
@@ -325,6 +404,10 @@
                 <button type="button" class="btn-today" onclick="goToTodayDate()">오늘</button>
             </div>
             <button type="button" class="mobile-toggle-btn" onclick="toggleMobileSettings()">⚙️ 개설 조건 및 출근 설정 표 열기/접기 ▾</button>
+        </div>
+
+        <div class="app-mode-only app-readonly-badge">
+            🔒 어플 조회의 전용 모드 (수정 및 세부 설정은 컴퓨터 PC에서만 가능합니다)
         </div>
         
         <div id="mobileSettingArea" class="mobile-hide-setting">
@@ -2344,6 +2427,11 @@ function refreshAllViewsFromRemote() {
 }
 
 function switchTab(tabId) {
+    if (document.body.classList.contains('app-mode')) {
+        if (tabId !== 'tab1' && tabId !== 'tab3') {
+            tabId = 'tab1';
+        }
+    }
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
