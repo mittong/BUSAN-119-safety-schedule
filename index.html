@@ -4308,13 +4308,41 @@ function generateSchedule(forceRegenerate = true) {
     let generalActiveCount = activeInstructorsList.filter(i => i.name !== '이영미' && !i.isSeomu).length;
     let extraPerInst = extraNeeded > 0 ? Math.max(1, Math.ceil(extraNeeded / Math.max(1, generalActiveCount))) : 0;
 
+    // [구급 출동 비상 인원 부족 시 스마트 3단계 자동 완화 한도 계산]
+    const emsRequiredCount = periodRequirements.filter(req => req.courseName === "구급출동").length;
+    let activeEmsParamedics = activeInstructorsList.filter(i => i.role === "구급" && i.possible.includes("구급출동"));
+    let activeEmsNonParamedics = activeInstructorsList.filter(i => i.role !== "구급" && i.possible.includes("구급출동"));
+    let normalEmsCapacity = (activeEmsParamedics.length * 2) + (activeEmsNonParamedics.length * 1);
+    
+    let extraEmsForNonParamedic = 0;
+    let extraEmsForParamedic = 0;
+
+    if (emsRequiredCount > normalEmsCapacity) {
+        // 1단계 비상: 공채 구급가능자가 있으면 1개 -> 2개 자동 확장 (+1)
+        if (activeEmsNonParamedics.length > 0) {
+            extraEmsForNonParamedic = 1;
+        }
+        let step1Capacity = (activeEmsParamedics.length * 2) + (activeEmsNonParamedics.length * (1 + extraEmsForNonParamedic));
+
+        if (emsRequiredCount > step1Capacity) {
+            // 2단계 비상: 구급 전담자 제한 2개 -> 3개 자동 확장 (+1)
+            extraEmsForParamedic = 1;
+            let step2Capacity = (activeEmsParamedics.length * 3) + (activeEmsNonParamedics.length * (1 + extraEmsForNonParamedic));
+
+            if (emsRequiredCount > step2Capacity && activeEmsNonParamedics.length > 0) {
+                // 3단계 극단적 비상: 공채 구급가능자 제한도 2개 -> 3개 최후 자동 확장 (+2)
+                extraEmsForNonParamedic = 2;
+            }
+        }
+    }
+
     const MAX_ATTEMPTS = 500;
     let bestScheduleMap = null;
     let bestUnassignedCount = Infinity;
     let bestScore = -Infinity;
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        const result = attemptScheduleAssignment(baseInstructorData, periodRequirements, activeNames, dateStr, extraPerInst);
+        const result = attemptScheduleAssignment(baseInstructorData, periodRequirements, activeNames, dateStr, extraPerInst, extraEmsForNonParamedic, extraEmsForParamedic);
         
         let score = - (result.unassignedCount * 100000);
 
@@ -4429,8 +4457,10 @@ function wouldCauseThreeConsecutive(busyPeriods, occupiedPeriods) {
 }
 
 /* 한 번의 배정 시도 */
-function attemptScheduleAssignment(baseInstructorData, periodRequirements, activeNames, dateStr, extraPerInst) {
+function attemptScheduleAssignment(baseInstructorData, periodRequirements, activeNames, dateStr, extraPerInst, extraEmsForNonParamedic, extraEmsForParamedic) {
     extraPerInst = extraPerInst || 0;
+    extraEmsForNonParamedic = extraEmsForNonParamedic || 0;
+    extraEmsForParamedic = extraEmsForParamedic || 0;
     const pins = (dateStr && dailySchedules[dateStr] && dailySchedules[dateStr].pinnedAssignments) ? dailySchedules[dateStr].pinnedAssignments : [];
     const extDuties = (dateStr && dailySchedules[dateStr] && dailySchedules[dateStr].externalDuties) ? dailySchedules[dateStr].externalDuties : [];
     const currentInstructors = baseInstructorData.map(inst => {
@@ -4566,15 +4596,26 @@ function attemptScheduleAssignment(baseInstructorData, periodRequirements, activ
             }
 
             // [규칙] 이영미 교수의 전기안전 독점을 제외하고는 모든 코스는 동일 인원이 하루 최대 2회까지만 배정 가능
+            // 단, 구급 과목 비상 시 구급 전담자 3개(extraEmsForParamedic), 공채 3단계 비상 시 3개(extraEmsForNonParamedic=2)까지 유연 허용
             if (req.courseName !== "전기안전" || inst.name !== "이영미") {
                 const courseCnt = inst.courseCounts[req.courseName] || 0;
-                if (courseCnt >= 2) return false;
+                let maxCourseCap = 2;
+                if (req.courseName === "구급출동") {
+                    if (inst.role === "구급") {
+                        maxCourseCap = 2 + extraEmsForParamedic;
+                    } else {
+                        maxCourseCap = Math.max(2, 1 + extraEmsForNonParamedic);
+                    }
+                }
+                if (courseCnt >= maxCourseCap) return false;
             }
 
             // [공채/비구급 출신 고정 규칙] 공채 등 구급 전담이 아닌 교수요원은 구급출동 과목을 하루 최대 1개로 엄격히 고정/제한!
+            // 단, 구급 인원 대거 부재 비상 시 extraEmsForNonParamedic(+1 또는 +2)이 자동 적용되어 2개~3개까지 유연 허용
             if (req.courseName === "구급출동" && inst.role !== "구급") {
                 const emsCnt = inst.courseCounts["구급출동"] || 0;
-                if (emsCnt >= 1) return false;
+                const maxNonParamedicEms = 1 + extraEmsForNonParamedic;
+                if (emsCnt >= maxNonParamedicEms) return false;
             }
 
             // [규칙] 새싹마을은 80분짜리라 겹치는 인접 교시까지 점유함 -> 겹치는 교시에 이미 다른 배정이 있으면 제외
