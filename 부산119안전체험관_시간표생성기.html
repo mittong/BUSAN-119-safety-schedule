@@ -233,7 +233,9 @@
             pointer-events: none !important;
             box-shadow: none !important;
             outline: none !important;
-               /* 셀 상세 정보 확대 팝업 모달 스타일 (개선됨) */
+        }
+
+        /* 셀 상세 정보 확대 팝업 모달 스타일 (개선됨) */
         .cell-detail-modal-overlay {
             display: none;
             position: fixed;
@@ -380,27 +382,6 @@
         @keyframes softPulse {
             0%, 100% { opacity: 0.8; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.02); }
-        }-value-group {
-            font-weight: bold;
-            color: #d32f2f;
-            font-size: 15px;
-            word-break: break-all;
-            line-height: 1.4;
-        }
-        .cell-detail-modal-footer {
-            padding: 10px 16px 16px;
-            text-align: center;
-        }
-        .modal-btn-confirm {
-            background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
         }
 
         /* 시간표 셀 터치 반응형 스타일 */
