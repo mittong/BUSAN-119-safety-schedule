@@ -2523,6 +2523,24 @@ function updateSyncStatusBadge(state) {
     }
 }
 
+function handleScheduleCellClick(pIdx, cIdx, evt) {
+    if (document.body.classList.contains('app-mode')) {
+        if (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+        openCellDetailModal(pIdx, cIdx);
+        return;
+    }
+    if (evt && evt.target && evt.target.tagName === 'BUTTON') {
+        return;
+    }
+    if (evt && evt.target && (evt.target.classList.contains('editable-inst') || evt.target.classList.contains('editable-group') || evt.target.classList.contains('editable-count'))) {
+        return;
+    }
+    openCellDetailModal(pIdx, cIdx);
+}
+
 function openCellDetailModal(pIdx, cIdx) {
     if (!lastGeneratedSchedule || !lastGeneratedSchedule[pIdx] || !lastGeneratedSchedule[pIdx][cIdx]) return;
     const cellData = lastGeneratedSchedule[pIdx][cIdx];
@@ -4607,15 +4625,15 @@ function renderScheduleTable(scheduleMap) {
                 let cancelBtnText = isCanceled ? '복구' : '취소';
                 let cancelBtnStyle = isCanceled ? 'background:#e0e0e0; color:#333;' : 'background:#ffebee; color:#c62828;';
 
-                html += `<td class="schedule-cell-clickable" onclick="openCellDetailModal(${pIdx}, ${cIdx})" title="터치시 상세보기 확대 팝업 보기" style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
+                html += `<td class="schedule-cell-clickable" onclick="handleScheduleCellClick(${pIdx}, ${cIdx}, event)" title="터치시 상세보기 확대 팝업 보기" style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
                     ${isCanceled ? '<div style="font-size:10px; color:#c62828; font-weight:bold; margin-bottom:2px;">🚫 [수업 취소됨]</div>' : ''}
-                    <input type="text" class="editable-inst" value="${instName}" style="${style}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
+                    <input type="text" class="editable-inst" value="${instName}" style="${style}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
                     ${cellData.sproutTime ? `<div class="cell-group-tag mobile-hide-btn" style="background:#e8f5e9; color:#1b5e20; ${isCanceled ? 'opacity:0.5;' : ''}">🕐 ${cellData.sproutTime}</div>` : ''}
                     <div style="margin-top:2px;">
-                        <input type="text" class="editable-group" value="${groupNameVal}" placeholder="단체명" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'group', this.value)">
+                        <input type="text" class="editable-group" value="${groupNameVal}" placeholder="단체명" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'group', this.value)">
                     </div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:2px; margin-top:2px;">
-                        <span style="${isCanceled ? 'text-decoration:line-through; opacity:0.6;' : ''}"><input type="number" class="editable-count" value="${cellData.count}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'count', this.value)">명</span>
+                        <span style="${isCanceled ? 'text-decoration:line-through; opacity:0.6;' : ''}"><input type="number" class="editable-count" value="${cellData.count}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'count', this.value)">명</span>
                         <button type="button" class="mobile-hide-btn" onclick="event.stopPropagation(); toggleScheduleCellCancel(${pIdx}, ${cIdx})" style="padding:2px 5px; font-size:10px; font-weight:bold; cursor:pointer; border:1px solid #ccc; border-radius:3px; ${cancelBtnStyle}">${cancelBtnText}</button>
                     </div>
                 </td>`;
