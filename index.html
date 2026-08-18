@@ -2931,7 +2931,7 @@ function initBookingTable() {
             } else if (isElecDisabled) {
                 html += `<td style="background-color:#f1f3f5; color:#aaa; font-size:11px;">운영없음</td>`;
             } else {
-                const sproutHintText = (c.name === "새싹마을" && sproutTimeLabels[pIdx]) ? `🕐 ${sproutTimeLabels[pIdx]} 시작` : '';
+                const sproutHintText = (c.name === "새싹마을" && sproutTimeLabels[pIdx]) ? `${sproutTimeLabels[pIdx]}` : '';
                 html += `
                     <td id="cell-td-${pIdx}-${cIdx}">
                         <div class="cell-container" id="cell-${pIdx}-${cIdx}">
