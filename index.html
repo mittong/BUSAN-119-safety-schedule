@@ -31,72 +31,178 @@
         }
     </script>
     <style>
-        body { font-family: '맑은 고딕', sans-serif; padding: 20px; background-color: #f8f9fa; margin: 0; }
-        .container { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1400px; margin: 0 auto; }
-        h1 { color: #d32f2f; margin-top: 0; margin-bottom: 5px; }
-        p.subtitle { color: #555; margin-bottom: 20px; font-size: 14px; }
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
         
-        /* 탭 스타일 */
-        .tab-menu { display: flex; border-bottom: 2px solid #dee2e6; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 24px; font-size: 15px; font-weight: bold; color: #495057; background: #e9ecef; border: none; border-radius: 8px 8px 0 0; cursor: pointer; margin-right: 4px; transition: 0.2s; }
-        .tab-btn.active { background: #d32f2f; color: white; }
+        body { 
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', '맑은 고딕', sans-serif; 
+            padding: 24px; 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #0f172a;
+            margin: 0; 
+            min-height: 100vh;
+        }
+
+        .container { 
+            background: #ffffff; 
+            padding: 28px 32px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.8); 
+            max-width: 1440px; 
+            margin: 0 auto; 
+        }
+
+        h1 { 
+            color: #0f172a; 
+            margin-top: 0; 
+            margin-bottom: 6px; 
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle { 
+            color: #64748b; 
+            margin-bottom: 22px; 
+            font-size: 14.5px; 
+            line-height: 1.5;
+        }
+        
+        /* 탭 내비게이션 (Segmented Control 스타일) */
+        .tab-menu { 
+            display: flex; 
+            background: #f1f5f9; 
+            padding: 5px;
+            border-radius: 16px; 
+            margin-bottom: 24px; 
+            border: 1px solid #e2e8f0;
+            gap: 4px;
+        }
+        .tab-btn { 
+            flex: 1;
+            padding: 12px 18px; 
+            font-size: 14.5px; 
+            font-weight: 700; 
+            color: #64748b; 
+            background: transparent; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            text-align: center;
+            letter-spacing: -0.3px;
+        }
+        .tab-btn:hover {
+            color: #1e293b;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); 
+            color: #ffffff; 
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+            transform: translateY(-1px);
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .panel-box { background-color: #f1f3f5; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef; }
-        .panel-title { font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #333; }
+        /* 패널 박스 & 대시보드 카드 */
+        .panel-box { 
+            background-color: #ffffff; 
+            padding: 20px 24px; 
+            border-radius: 18px; 
+            margin-bottom: 24px; 
+            border: 1px solid rgba(226, 232, 240, 0.9); 
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+        }
+        .panel-title { 
+            font-weight: 800; 
+            margin-bottom: 14px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            color: #0f172a; 
+            font-size: 16px;
+            letter-spacing: -0.3px;
+        }
         
-        .attendance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px; }
-        .attendance-item { display: flex; flex-direction: column; background: white; padding: 8px 10px; border-radius: 4px; border: 1px solid #dee2e6; font-size: 13px; gap: 6px; }
+        .attendance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; }
+        .attendance-item { 
+            display: flex; 
+            flex-direction: column; 
+            background: #ffffff; 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            font-size: 13.5px; 
+            gap: 8px; 
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .attendance-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
         .attendance-item-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: nowrap; overflow: hidden; }
-        .attendance-item-top label { display: flex; align-items: center; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-        .attendance-item-bottom { display: flex; align-items: center; justify-content: space-between; background-color: #f8f9fa; padding: 4px 6px; border-radius: 4px; font-size: 11px; }
+        .attendance-item-top label { display: flex; align-items: center; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-weight: 700; color: #1e293b; }
+        .attendance-item-bottom { display: flex; align-items: center; justify-content: space-between; background-color: #f8fafc; padding: 6px 10px; border-radius: 8px; font-size: 11.5px; border: 1px solid #f1f5f9; }
         
-        .attendance-item input[type="checkbox"] { margin-right: 4px; cursor: pointer; }
-        .role-badge { font-size: 11px; color: #666; margin-left: 2px; white-space: nowrap; }
-        .sprout-priority-chk { font-size: 11px; color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 2px 4px; border-radius: 3px; border: 1px solid #c8e6c9; margin-left: 2px; white-space: nowrap; flex-shrink: 0; }
-        .seomu-chk { font-size: 11px; color: #1565c0; font-weight: bold; background: #e3f2fd; padding: 2px 4px; border-radius: 3px; border: 1px solid #bbdefb; margin-left: 2px; white-space: nowrap; flex-shrink: 0; }
-        .target-select-wrap { white-space: nowrap; flex-shrink: 0; font-size: 11px; color: #555; }
+        .attendance-item input[type="checkbox"] { margin-right: 6px; cursor: pointer; accent-color: #dc2626; width: 16px; height: 16px; }
+        .role-badge { font-size: 11.5px; color: #64748b; margin-left: 2px; white-space: nowrap; font-weight: 600; }
+        .sprout-priority-chk { font-size: 11px; color: #15803d; font-weight: 700; background: #f0fdf4; padding: 3px 6px; border-radius: 6px; border: 1px solid #bbf7d0; margin-left: 2px; white-space: nowrap; flex-shrink: 0; }
+        .seomu-chk { font-size: 11px; color: #1d4ed8; font-weight: 700; background: #eff6ff; padding: 3px 6px; border-radius: 6px; border: 1px solid #bfdbfe; margin-left: 2px; white-space: nowrap; flex-shrink: 0; }
+        .target-select-wrap { white-space: nowrap; flex-shrink: 0; font-size: 11.5px; color: #475569; font-weight: 600; }
 
-        .target-select { font-size: 12px; padding: 2px 4px; border-radius: 3px; border: 1px solid #ced4da; }
-        .period-chk-group { display: flex; gap: 4px; flex-wrap: wrap; }
-        .period-chk-group label { font-size: 11px; color: #d32f2f; cursor: pointer; }
+        .target-select { font-size: 12px; padding: 3px 6px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 700; color: #0f172a; background-color: #ffffff; }
+        .period-chk-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .period-chk-group label { font-size: 11.5px; color: #dc2626; cursor: pointer; font-weight: 700; }
 
-        .setting-table, .booking-table, .stat-table, .summary-table { width: 100%; border-collapse: collapse; background: white; font-size: 13px; margin-top: 10px; }
-        .setting-table th, .setting-table td, .booking-table th, .booking-table td, .stat-table th, .stat-table td, .summary-table th, .summary-table td { border: 1px solid #dee2e6; padding: 6px; text-align: center; }
-        .setting-table th, .booking-table th, .stat-table th, .summary-table th { background-color: #e9ecef; }
+        /* 테이블 기본 공통 스타일 */
+        .setting-table, .booking-table, .stat-table, .summary-table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; font-size: 13.5px; margin-top: 12px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .setting-table th, .setting-table td, .booking-table th, .booking-table td, .stat-table th, .stat-table td, .summary-table th, .summary-table td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 8px 6px; text-align: center; }
+        .setting-table th:last-child, .setting-table td:last-child, .booking-table th:last-child, .booking-table td:last-child, .stat-table th:last-child, .stat-table td:last-child, .summary-table th:last-child, .summary-table td:last-child { border-right: none; }
+        .setting-table tr:last-child td, .booking-table tr:last-child td, .stat-table tr:last-child td, .summary-table tr:last-child td { border-bottom: none; }
+        
+        .setting-table th, .booking-table th, .stat-table th, .summary-table th { background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); color: #334155; font-weight: 800; }
         
         /* 단체 구분 시 셀 배경색 구분을 위한 스타일 조정 */
         .booking-table td.has-group { transition: background-color 0.3s; }
-        .group-input { width: 95%; padding: 3px; font-size: 11px; border: 1px solid rgba(0,0,0,0.2); border-radius: 3px; text-align: center; margin-bottom: 2px; background: rgba(255,255,255,0.85); font-weight: bold; }
-        .count-input { width: 95%; padding: 3px; font-size: 11px; border: 1px solid rgba(0,0,0,0.2); border-radius: 3px; text-align: center; background: rgba(255,255,255,0.85); }
-        .cell-container { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 4px; }
-        .sprout-hint-slot { font-size: 10px; color: #2e7d32; font-weight: bold; height: 13px; line-height: 13px; }
-        .chk-label { font-size: 11px; color: #111; cursor: pointer; display: flex; align-items: center; gap: 3px; margin-bottom: 3px; font-weight: bold; }
+        .group-input { width: 95%; padding: 4px; font-size: 11.5px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 6px; text-align: center; margin-bottom: 3px; background: rgba(255,255,255,0.9); font-weight: 800; color: #0f172a; }
+        .count-input { width: 95%; padding: 4px; font-size: 11.5px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 6px; text-align: center; background: rgba(255,255,255,0.9); font-weight: 700; }
+        .cell-container { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px; border-radius: 8px; }
+        .sprout-hint-slot { font-size: 10px; color: #15803d; font-weight: 800; height: 13px; line-height: 13px; }
+        .chk-label { font-size: 11.5px; color: #0f172a; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-bottom: 4px; font-weight: 800; }
         
-        .select-role { padding: 3px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #ced4da; }
-        .inst-name-input { width: 90px; padding: 4px 6px; font-size: 13px; font-weight: bold; border: 1px solid transparent; border-radius: 4px; background: transparent; }
-        .inst-name-input:hover, .inst-name-input:focus { border: 1px solid #ced4da; background: white; }
-        .btn-small { background-color: #6c757d; color: white; border: none; padding: 4px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; margin-left: 4px; }
-        .btn-small:hover { background-color: #495057; }
-        .btn-save { background-color: #28a745; color: white; border: none; padding: 4px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-left: 4px; }
-        .btn-save:hover { background-color: #218838; }
-        .btn-excel { background-color: #17a2b8; color: white; border: none; padding: 4px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-left: 4px; }
-        .btn-excel:hover { background-color: #138496; }
-        .btn-excel2 { background-color: #007bff; color: white; border: none; padding: 4px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-left: 4px; }
-        .btn-excel2:hover { background-color: #0056b3; }
-        .btn-reset { background-color: #dc3545; color: white; border: none; padding: 4px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; margin-left: 4px; }
-        .btn-reset:hover { background-color: #bd2130; }
+        .select-role { padding: 4px 8px; font-size: 12.5px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 700; color: #0f172a; }
+        .inst-name-input { width: 90px; padding: 4px 6px; font-size: 13px; font-weight: 800; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #0f172a; }
+        .inst-name-input:hover, .inst-name-input:focus { border: 1px solid #cbd5e1; background: white; }
         
-        button.generate-btn { background-color: #d32f2f; color: white; border: none; padding: 14px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 10px; }
-        button.generate-btn:hover { background-color: #b71c1c; }
+        /* 버튼 조작부 스타일 리파인 */
+        .btn-small { background: #475569; color: white; border: none; padding: 5px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; margin-left: 4px; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-small:hover { background: #334155; transform: translateY(-1px); }
+        .btn-small:active { transform: translateY(0); }
+
+        .btn-save { background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; padding: 6px 14px; font-size: 12.5px; font-weight: 800; border-radius: 8px; cursor: pointer; margin-left: 4px; transition: all 0.15s ease; box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25); }
+        .btn-save:hover { background: linear-gradient(135deg, #15803d, #166534); transform: translateY(-1px); }
+
+        .btn-excel { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; padding: 6px 14px; font-size: 12.5px; font-weight: 800; border-radius: 8px; cursor: pointer; margin-left: 4px; transition: all 0.15s ease; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25); }
+        .btn-excel:hover { background: linear-gradient(135deg, #0369a1, #075985); transform: translateY(-1px); }
+
+        .btn-excel2 { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 6px 14px; font-size: 12.5px; font-weight: 800; border-radius: 8px; cursor: pointer; margin-left: 4px; transition: all 0.15s ease; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25); }
+        .btn-excel2:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); }
+
+        .btn-reset { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; margin-left: 4px; transition: all 0.15s ease; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2); }
+        .btn-reset:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); transform: translateY(-1px); }
         
-        table.schedule-table { border-collapse: collapse; width: 100%; margin-top: 15px; font-size: 13px; }
-        table.schedule-table th, table.schedule-table td { border: 1px solid #dee2e6; padding: 8px 4px; text-align: center; }
-        table.schedule-table th { background-color: #e9ecef; color: #333; }
+        button.generate-btn { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; padding: 16px 28px; font-size: 16.5px; font-weight: 800; border-radius: 14px; cursor: pointer; transition: all 0.2s ease; width: 100%; margin-top: 14px; box-shadow: 0 8px 20px -4px rgba(220, 38, 38, 0.35); letter-spacing: -0.3px; }
+        button.generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -4px rgba(220, 38, 38, 0.45); }
+        button.generate-btn:active { transform: translateY(0); }
         
-        .stat-num-input { width: 50px; text-align: center; padding: 2px; border: 1px solid #ccc; border-radius: 3px; }
-        .special-user { background-color: #fff3cd; }
+        table.schedule-table { border-collapse: separate; border-spacing: 0; width: 100%; margin-top: 15px; font-size: 13.5px; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; }
+        table.schedule-table th, table.schedule-table td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 8px 4px; text-align: center; }
+        table.schedule-table th:last-child, table.schedule-table td:last-child { border-right: none; }
+        table.schedule-table tr:last-child td { border-bottom: none; }
+        table.schedule-table th { background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); color: #334155; font-weight: 800; }
+        
+        .stat-num-input { width: 44px; text-align: center; padding: 3px; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; }
+        .special-user { background-color: #fefce8; }
         /* ====================================================
            [앱 모드(.apk/PWA) vs 웹 브라우저(홈페이지) 분리 스타일]
            ==================================================== */
@@ -104,14 +210,14 @@
         .app-mode-only { display: none !important; }
 
         body.app-mode {
-            padding: 8px 6px !important;
-            background-color: #f1f3f5 !important;
+            padding: 10px 8px !important;
+            background: #f1f5f9 !important;
         }
 
         body.app-mode .container {
-            padding: 12px 8px !important;
-            border-radius: 10px !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+            padding: 14px 10px !important;
+            border-radius: 18px !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
         }
 
         body.app-mode .web-mode-only {
@@ -126,48 +232,55 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             color: white;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 6px rgba(211,47,47,0.3);
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
         }
 
         .app-nav-title {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 16.5px;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 6px;
+            letter-spacing: -0.3px;
         }
 
         .app-mode-badge {
             font-size: 10px;
-            background: rgba(255,255,255,0.25);
-            color: white;
-            padding: 2px 6px;
+            background: rgba(255,255,255,0.2);
+            color: #ffffff;
+            padding: 2px 7px;
             border-radius: 10px;
-            font-weight: normal;
+            font-weight: 700;
+        }
+
+        body.app-mode .tab-menu {
+            background: #e2e8f0 !important;
+            padding: 4px !important;
+            border-radius: 14px !important;
         }
 
         body.app-mode .tab-btn {
-            padding: 8px 10px !important;
-            font-size: 12.5px !important;
-            border-radius: 6px 6px 0 0 !important;
+            padding: 10px 6px !important;
+            font-size: 13.5px !important;
+            border-radius: 10px !important;
         }
 
         .web-app-link-badge {
-            font-size: 11px;
-            background-color: #e8f5e9;
-            color: #1b5e20;
-            border: 1px solid #c8e6c9;
-            padding: 4px 10px;
-            border-radius: 15px;
+            font-size: 11.5px;
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            padding: 4px 12px;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         /* ====================================================
@@ -5201,19 +5314,25 @@ function recalculateMonthlyStats() {
 
     summaryData.forEach((item) => {
         let isExcludedFromRank = (item.name === '이영미' || seomuSet.has(item.name));
-        let rankStr = isExcludedFromRank ? '-' : (rankMap[item.name] || '-');
+        let rawRank = rankMap[item.name];
+        let rankStr = isExcludedFromRank ? '-' : (rawRank || '-');
+        if (!isExcludedFromRank && rawRank) {
+            if (rawRank === '1위') rankStr = '<span style="display:inline-flex; align-items:center; gap:2px; padding:2px 8px; background:#fef3c7; border:1px solid #fde68a; border-radius:12px; color:#b45309; font-weight:800; font-size:12px;">🥇 1위</span>';
+            else if (rawRank === '2위') rankStr = '<span style="display:inline-flex; align-items:center; gap:2px; padding:2px 8px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:12px; color:#475569; font-weight:800; font-size:12px;">🥈 2위</span>';
+            else if (rawRank === '3위') rankStr = '<span style="display:inline-flex; align-items:center; gap:2px; padding:2px 8px; background:#ffedd5; border:1px solid #fed7aa; border-radius:12px; color:#c2410c; font-weight:800; font-size:12px;">🥉 3위</span>';
+        }
         tbody.innerHTML += `
             <tr class="${item.name === '이영미' ? 'special-user' : (seomuSet.has(item.name) ? 'seomu-user' : '')}">
                 <td><strong>${item.name}</strong> ${item.isFormer ? '<span style="font-size:10px; color:#888;">(전출)</span>' : ''} ${seomuSet.has(item.name) ? '<span style="font-size:10px; color:#1565c0;">(서무)</span>' : ''}</td>
-                <td><strong style="color:#d32f2f; font-size:14px;">${item.total.toFixed(1)}</strong></td>
+                <td><strong style="color:#dc2626; font-size:14px;">${item.total.toFixed(1)}</strong></td>
                 <td>${item.role}</td>
                 <td>${item.actualClass.toFixed(1)}</td>
-                <td style="background-color:#e3f2fd; font-weight:bold; color:#1565c0;">${(item.dutyComp || 0).toFixed(1)}</td>
-                <td style="background-color:#fff3e0; font-weight:bold; color:#e65100;">${item.vacationComp.toFixed(1)}</td>
+                <td style="background-color:#eff6ff; font-weight:bold; color:#1d4ed8;">${(item.dutyComp || 0).toFixed(1)}</td>
+                <td style="background-color:#fff7ed; font-weight:bold; color:#c2410c;">${item.vacationComp.toFixed(1)}</td>
                 <td>
                     <input type="number" class="stat-num-input" value="${item.accidentCount}" onchange="updateAccidentCount('${item.name}', this.value)">
                 </td>
-                <td><strong>${rankStr}</strong></td>
+                <td>${rankStr}</td>
             </tr>
         `;
     });
