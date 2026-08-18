@@ -705,12 +705,12 @@ const courses = [
 ];
 const roles = ["구급", "공채", "구조", "공무직"];
 const standardPeriods = [
-    { name: "1교시", timeStr: "09:30<br>~<br>10:30", shortTime: "09:30~10:30" },
-    { name: "2교시", timeStr: "10:30<br>~<br>11:30", shortTime: "10:30~11:30" },
-    { name: "3교시", timeStr: "11:30<br>~<br>12:30", shortTime: "11:30~12:30" },
-    { name: "4교시", timeStr: "13:30<br>~<br>14:30", shortTime: "13:30~14:30" },
-    { name: "5교시", timeStr: "14:30<br>~<br>15:30", shortTime: "14:30~15:30" },
-    { name: "6교시", timeStr: "15:30<br>~<br>16:30", shortTime: "15:30~16:30" }
+    { name: "1교시", timeStr: "09:30~10:30", shortTime: "09:30~10:30" },
+    { name: "2교시", timeStr: "10:30~11:30", shortTime: "10:30~11:30" },
+    { name: "3교시", timeStr: "11:30~12:30", shortTime: "11:30~12:30" },
+    { name: "4교시", timeStr: "13:30~14:30", shortTime: "13:30~14:30" },
+    { name: "5교시", timeStr: "14:30~15:30", shortTime: "14:30~15:30" },
+    { name: "6교시", timeStr: "15:30~16:30", shortTime: "15:30~16:30" }
 ];
 const initialInstructors = [
     { name: "박건욱", role: "공채", team: "1조", isSeomu: false, possible: ["도시재난", "자연재난", "생활안전", "화재대응", "전기안전"], monthlyClass: 0, monthlyAccident: 0 },
@@ -2636,7 +2636,7 @@ function initBookingTable() {
     html += "</tr></thead><tbody>";
 
     standardPeriods.forEach((p, pIdx) => {
-        html += `<tr><td><strong>${p.name}</strong><br><small>${p.timeStr}</small></td>`;
+        html += `<tr><td style="white-space:nowrap; text-align:center;"><strong>${p.name}</strong><br><small style="color:#666; font-size:9.5px; white-space:nowrap; display:block;">(${p.timeStr})</small></td>`;
         courses.forEach((c, cIdx) => {
             let isSproutDisabled = (c.name === "새싹마을" && (pIdx === 0 || pIdx === 5));
             let isElecDisabled = (c.name === "전기안전" && pIdx === 2); // 3교시 전기안전은 원래 없는 수업
@@ -4461,7 +4461,7 @@ function renderScheduleTable(scheduleMap) {
     const isSunday = dateStr ? (new Date(dateStr).getDay() === 0) : false;
 
     standardPeriods.forEach((p, pIdx) => {
-        html += `<tr><td><strong>${p.name}</strong><br><small>${p.timeStr}</small></td>`;
+        html += `<tr><td style="white-space:nowrap; text-align:center;"><strong>${p.name}</strong><br><small style="color:#666; font-size:9.5px; white-space:nowrap; display:block;">(${p.timeStr})</small></td>`;
         courses.forEach((c, cIdx) => {
             let cellData = scheduleMap[pIdx] ? scheduleMap[pIdx][cIdx] : null;
             if (c.name === "새싹마을" && (pIdx === 0 || pIdx === 5)) {
