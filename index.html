@@ -4290,6 +4290,7 @@ function generateSchedule(forceRegenerate = true) {
         const getCoursePriority = (cName) => {
             if (cName === "새싹마을") return 1;
             if (cName === "구급출동") return 2;
+            if (cName === "전기안전") return 3;
             return 4;
         };
         const priA = getCoursePriority(a.courseName);
@@ -4332,6 +4333,12 @@ function generateSchedule(forceRegenerate = true) {
             } else {
                 score -= (diff * 50);
             }
+        }
+
+        // [이영미 부재 시 일반 교관 전기안전 2개 이상 쏠림 강력 감점]
+        let nonLeeElecOverOne = result.currentInstructors.filter(i => activeNames.includes(i.name) && i.name !== '이영미' && (i.courseCounts["전기안전"] || 0) >= 2);
+        if (nonLeeElecOverOne.length > 0) {
+            score -= nonLeeElecOverOne.length * 200000;
         }
 
         // [월간 누적 실적 점진적 보정 - 최대 1개 차이 범위 내에서 보정]
@@ -4558,8 +4565,8 @@ function attemptScheduleAssignment(baseInstructorData, periodRequirements, activ
                 if (leeActive && inst.name !== "이영미") return false;
             }
 
-            // [규칙] 전기안전을 제외한 코스는 같은 교수요원이 하루 최대 2회까지만 배정 가능
-            if (req.courseName !== "전기안전") {
+            // [규칙] 이영미 교수의 전기안전 독점을 제외하고는 모든 코스는 동일 인원이 하루 최대 2회까지만 배정 가능
+            if (req.courseName !== "전기안전" || inst.name !== "이영미") {
                 const courseCnt = inst.courseCounts[req.courseName] || 0;
                 if (courseCnt >= 2) return false;
             }
@@ -4660,11 +4667,17 @@ function attemptScheduleAssignment(baseInstructorData, periodRequirements, activ
             }
 
             // [절대 규칙 1] 전기안전은 이영미 최우선 독점 (이영미 출근 시)
-            // 이영미 부재 시: 이번 달 '전기안전' 수업을 가장 안 들어간 교수요원 최우선 배정 (공평한 순환)
+            // 이영미 부재 시: 오늘 전기안전 수업 수(0개 -> 1개) 적은 교수요원 최우선 1개씩 분배!
             if (req.courseName === "전기안전") {
                 const aIsLee = a.name === "이영미";
                 const bIsLee = b.name === "이영미";
                 if (aIsLee !== bIsLee) return bIsLee ? 1 : -1;
+
+                const aCourseCnt = a.courseCounts[req.courseName] || 0;
+                const bCourseCnt = b.courseCounts[req.courseName] || 0;
+                if (aCourseCnt !== bCourseCnt) {
+                    return aCourseCnt - bCourseCnt;
+                }
 
                 const aElec = a.monthlyElecBaseline || 0;
                 const bElec = b.monthlyElecBaseline || 0;
@@ -4772,7 +4785,7 @@ function renderScheduleTable(scheduleMap) {
                 html += `<td class="schedule-cell-clickable" onclick="handleScheduleCellClick(${pIdx}, ${cIdx}, event)" title="터치시 상세보기 확대 팝업 보기" style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
                     ${isCanceled ? '<div style="font-size:10px; color:#c62828; font-weight:bold; margin-bottom:2px;">🚫 [수업 취소됨]</div>' : ''}
                     <input type="text" class="editable-inst" value="${instName}" style="${style}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
-                    ${cellData.sproutTime ? `<div class="cell-group-tag mobile-hide-btn" style="background:#e8f5e9; color:#1b5e20; ${isCanceled ? 'opacity:0.5;' : ''}">🕐 ${cellData.sproutTime}</div>` : ''}
+                    ${(cellData.sproutTime || (c.name === "새싹마을" ? sproutTimeLabels[pIdx] : null)) ? `<div style="font-size:10.5px; font-weight:800; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:1px 6px; margin:2px auto; display:inline-flex; align-items:center; gap:2px; ${isCanceled ? 'opacity:0.5;' : ''}">🕐 ${cellData.sproutTime || sproutTimeLabels[pIdx]}</div>` : ''}
                     <div style="margin-top:2px;">
                         <input type="text" class="editable-group" value="${groupNameVal}" placeholder="단체명" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'group', this.value)">
                     </div>
