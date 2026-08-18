@@ -248,6 +248,120 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        /* 셀 상세 정보 확대 팝업 모달 스타일 */
+        .cell-detail-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(3px);
+        }
+        .cell-detail-modal-overlay.active {
+            display: flex !important;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .cell-detail-modal-card {
+            background: white;
+            width: 100%;
+            max-width: 360px;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            animation: popUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .cell-detail-modal-header {
+            padding: 14px 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #d32f2f;
+        }
+        .cell-detail-close-btn {
+            background: rgba(0,0,0,0.15);
+            border: none;
+            color: inherit;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .cell-detail-modal-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        .modal-detail-row.highlight-row {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #d32f2f;
+        }
+        .modal-label {
+            font-weight: bold;
+            color: #555;
+            white-space: nowrap;
+            min-width: 90px;
+        }
+        .modal-value {
+            font-weight: bold;
+            color: #111;
+        }
+        .modal-value-group {
+            font-weight: bold;
+            color: #d32f2f;
+            font-size: 15px;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+        .cell-detail-modal-footer {
+            padding: 10px 16px 16px;
+            text-align: center;
+        }
+        .modal-btn-confirm {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* 시간표 셀 터치 반응형 및 돋보기 힌트 스타일 */
+        table.schedule-table td.schedule-cell-clickable {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        table.schedule-table td.schedule-cell-clickable:active {
+            transform: scale(0.96);
+        }
     </style>
     <style>
         .seomu-user { background-color: #e3f2fd; }
@@ -383,6 +497,37 @@
             <span class="app-mode-badge">📱 어플 모드</span>
         </div>
         <span id="syncStatusBadgeApp" class="info-badge" style="background:rgba(255,255,255,0.9); color:#111; font-weight:bold; font-size:11px;">🟢 연결됨</span>
+    </div>
+
+    <!-- 셀 상세 정보 확대 팝업 모달 -->
+    <div id="cellDetailModal" class="cell-detail-modal-overlay" onclick="closeCellDetailModal(event)">
+        <div class="cell-detail-modal-card" onclick="event.stopPropagation()">
+            <div class="cell-detail-modal-header" id="modalHeaderBg">
+                <div id="modalTitle">📌 1교시 - 도시재난</div>
+                <button type="button" class="cell-detail-close-btn" onclick="closeCellDetailModal()">✕</button>
+            </div>
+            <div class="cell-detail-modal-body">
+                <div class="modal-detail-row">
+                    <span class="modal-label">👨‍🚒 담당 교관:</span>
+                    <span class="modal-value" id="modalInst">홍길동</span>
+                </div>
+                <div class="modal-detail-row highlight-row">
+                    <span class="modal-label">🏢 풀 단체명:</span>
+                    <span class="modal-value-group" id="modalGroup">부산 해운대초등학교 3학년 2반</span>
+                </div>
+                <div class="modal-detail-row">
+                    <span class="modal-label">👥 체험 인원:</span>
+                    <span class="modal-value" id="modalCount">25명</span>
+                </div>
+                <div class="modal-detail-row" id="modalSproutRow" style="display:none;">
+                    <span class="modal-label">🕐 시작 시각:</span>
+                    <span class="modal-value" id="modalSproutTime">10:00 시작</span>
+                </div>
+            </div>
+            <div class="cell-detail-modal-footer">
+                <button type="button" class="modal-btn-confirm" onclick="closeCellDetailModal()">확인 (닫기)</button>
+            </div>
+        </div>
     </div>
 
     <!-- 탭 내비게이션 -->
@@ -2374,6 +2519,59 @@ function updateSyncStatusBadge(state) {
     if (badgeApp && badgeApp.style) {
         badgeApp.innerText = text; badgeApp.style.color = color; badgeApp.style.backgroundColor = bg;
     }
+}
+
+function openCellDetailModal(pIdx, cIdx) {
+    if (!lastGeneratedSchedule || !lastGeneratedSchedule[pIdx] || !lastGeneratedSchedule[pIdx][cIdx]) return;
+    const cellData = lastGeneratedSchedule[pIdx][cIdx];
+    const period = standardPeriods[pIdx];
+    const course = courses[cIdx];
+    if (!cellData || !period || !course) return;
+
+    const modal = document.getElementById('cellDetailModal');
+    if (!modal) return;
+
+    const instName = cellData.instructor || "미배정";
+    const groupName = cellData.group ? cellData.group.trim() : "개인 / 단체 없음";
+    const countVal = (cellData.count !== undefined ? cellData.count : 0) + "명";
+    const isCanceled = !!cellData.canceled;
+
+    document.getElementById('modalTitle').innerHTML = `📌 ${period.name} (${period.timeStr}) - ${course.name}`;
+    document.getElementById('modalInst').innerText = instName + (isCanceled ? " 🚫 [수업 취소됨]" : "");
+    document.getElementById('modalGroup').innerText = groupName;
+    document.getElementById('modalCount').innerText = countVal;
+
+    const groupColor = isCanceled ? '#757575' : getGroupColor(cellData.group);
+    const headerBg = document.getElementById('modalHeaderBg');
+    if (headerBg) {
+        if (groupColor && groupColor !== 'transparent' && groupColor !== '#ffffff') {
+            headerBg.style.backgroundColor = groupColor;
+            headerBg.style.color = '#111';
+        } else {
+            headerBg.style.backgroundColor = '#d32f2f';
+            headerBg.style.color = '#fff';
+        }
+    }
+
+    const sproutRow = document.getElementById('modalSproutRow');
+    if (cellData.sproutTime && sproutRow) {
+        sproutRow.style.display = 'flex';
+        document.getElementById('modalSproutTime').innerText = `🕐 ${cellData.sproutTime} 시작`;
+    } else if (sproutRow) {
+        sproutRow.style.display = 'none';
+    }
+
+    modal.classList.add('active');
+}
+
+function closeCellDetailModal(event) {
+    if (event && event.target) {
+        const isOverlay = event.target.classList.contains('cell-detail-modal-overlay');
+        const isBtn = event.target.classList.contains('modal-btn-confirm') || event.target.classList.contains('cell-detail-close-btn');
+        if (!isOverlay && !isBtn) return;
+    }
+    const modal = document.getElementById('cellDetailModal');
+    if (modal) modal.classList.remove('active');
 }
 
 function initAppDisplayMode() {
@@ -4406,16 +4604,16 @@ function renderScheduleTable(scheduleMap) {
                 let cancelBtnText = isCanceled ? '복구' : '취소';
                 let cancelBtnStyle = isCanceled ? 'background:#e0e0e0; color:#333;' : 'background:#ffebee; color:#c62828;';
 
-                html += `<td style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
+                html += `<td class="schedule-cell-clickable" onclick="openCellDetailModal(${pIdx}, ${cIdx})" title="${groupNameVal ? '🏢 ' + groupNameVal + ' (터치시 확대)' : '터치시 상세보기'}" style="background-color:${groupColor}; position:relative; ${isCanceled ? 'border:2px dashed #e53935;' : ''}">
                     ${isCanceled ? '<div style="font-size:10px; color:#c62828; font-weight:bold; margin-bottom:2px;">🚫 [수업 취소됨]</div>' : ''}
-                    <input type="text" class="editable-inst" value="${instName}" style="${style}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
+                    <input type="text" class="editable-inst" value="${instName}" style="${style}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
                     ${cellData.sproutTime ? `<div class="cell-group-tag mobile-hide-btn" style="background:#e8f5e9; color:#1b5e20; ${isCanceled ? 'opacity:0.5;' : ''}">🕐 ${cellData.sproutTime}</div>` : ''}
                     <div style="margin-top:2px;">
-                        <input type="text" class="editable-group" value="${groupNameVal}" placeholder="단체명" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'group', this.value)">
+                        <input type="text" class="editable-group" value="${groupNameVal}" placeholder="단체명" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'group', this.value)">
                     </div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:2px; margin-top:2px;">
-                        <span style="${isCanceled ? 'text-decoration:line-through; opacity:0.6;' : ''}"><input type="number" class="editable-count" value="${cellData.count}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'count', this.value)">명</span>
-                        <button type="button" class="mobile-hide-btn" onclick="toggleScheduleCellCancel(${pIdx}, ${cIdx})" style="padding:2px 5px; font-size:10px; font-weight:bold; cursor:pointer; border:1px solid #ccc; border-radius:3px; ${cancelBtnStyle}">${cancelBtnText}</button>
+                        <span style="${isCanceled ? 'text-decoration:line-through; opacity:0.6;' : ''}"><input type="number" class="editable-count" value="${cellData.count}" onclick="event.stopPropagation()" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'count', this.value)">명</span>
+                        <button type="button" class="mobile-hide-btn" onclick="event.stopPropagation(); toggleScheduleCellCancel(${pIdx}, ${cIdx})" style="padding:2px 5px; font-size:10px; font-weight:bold; cursor:pointer; border:1px solid #ccc; border-radius:3px; ${cancelBtnStyle}">${cancelBtnText}</button>
                     </div>
                 </td>`;
             } else {
