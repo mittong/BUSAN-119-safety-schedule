@@ -2810,7 +2810,7 @@ function initBookingTable() {
     html += "</tr></thead><tbody>";
 
     standardPeriods.forEach((p, pIdx) => {
-        html += `<tr><td style="white-space:nowrap; text-align:center;"><strong>${p.name}</strong><br><small style="color:#666; font-size:9.5px; white-space:nowrap; display:block;">(${p.timeStr})</small></td>`;
+        html += `<tr><td style="white-space:nowrap; text-align:center;"><strong>${p.name}</strong><br><small style="color:#666; font-size:9.5px; display:block; line-height:1.25; margin-top:2px;">${p.timeStr.replace('~', '<br>~<br>')}</small></td>`;
         courses.forEach((c, cIdx) => {
             let isSproutDisabled = (c.name === "새싹마을" && (pIdx === 0 || pIdx === 5));
             let isElecDisabled = (c.name === "전기안전" && pIdx === 2); // 3교시 전기안전은 원래 없는 수업
@@ -4635,7 +4635,7 @@ function renderScheduleTable(scheduleMap) {
     const isSunday = dateStr ? (new Date(dateStr).getDay() === 0) : false;
 
     standardPeriods.forEach((p, pIdx) => {
-        html += `<tr><td style="white-space:nowrap; text-align:center;"><strong>${p.name}</strong><br><small style="color:#666; font-size:9.5px; white-space:nowrap; display:block;">(${p.timeStr})</small></td>`;
+        html += `<tr><td style="white-space:nowrap; text-align:center;"><strong>${p.name}</strong><br><small style="color:#666; font-size:9.5px; display:block; line-height:1.25; margin-top:2px;">${p.timeStr.replace('~', '<br>~<br>')}</small></td>`;
         courses.forEach((c, cIdx) => {
             let cellData = scheduleMap[pIdx] ? scheduleMap[pIdx][cIdx] : null;
             if (c.name === "새싹마을" && (pIdx === 0 || pIdx === 5)) {
