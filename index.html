@@ -233,67 +233,71 @@
             pointer-events: none !important;
             box-shadow: none !important;
             outline: none !important;
-            cursor: default !important;
-            color: #111 !important;
-            font-weight: bold !important;
-        }
-
-        body.app-mode input[type="number"].editable-count {
-            -moz-appearance: textfield;
-            width: auto !important;
-        }
-
-        body.app-mode input[type="number"].editable-count::-webkit-inner-spin-button,
-        body.app-mode input[type="number"].editable-count::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* 셀 상세 정보 확대 팝업 모달 스타일 */
+               /* 셀 상세 정보 확대 팝업 모달 스타일 (개선됨) */
         .cell-detail-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(15, 23, 42, 0.55);
             z-index: 99999;
             align-items: center;
             justify-content: center;
-            padding: 16px;
-            backdrop-filter: blur(3px);
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            cursor: pointer;
         }
         .cell-detail-modal-overlay.active {
             display: flex !important;
-            animation: fadeIn 0.2s ease-out;
+            animation: fadeInOverlay 0.2s ease-out;
+        }
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .cell-detail-modal-card {
-            background: white;
+            background: #ffffff;
             width: 100%;
-            max-width: 360px;
-            border-radius: 14px;
+            max-width: 380px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            animation: popUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+            animation: modalPopUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: background-color 0.25s ease, transform 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        @keyframes popUp {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .cell-detail-modal-card:active {
+            transform: scale(0.98);
+        }
+        @keyframes modalPopUp {
+            0% { transform: scale(0.85) translateY(12px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
         .cell-detail-modal-header {
-            padding: 14px 16px;
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
+            padding: 20px 22px 14px;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #d32f2f;
+            background: transparent;
+        }
+        .modal-header-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.35;
+            letter-spacing: -0.3px;
+            color: inherit;
         }
         .cell-detail-close-btn {
-            background: rgba(0,0,0,0.15);
+            background: rgba(0, 0, 0, 0.08);
             border: none;
             color: inherit;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             font-size: 14px;
             cursor: pointer;
@@ -301,37 +305,82 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            flex-shrink: 0;
+            transition: background 0.15s ease;
+        }
+        .cell-detail-close-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
         }
         .cell-detail-modal-body {
-            padding: 16px;
+            padding: 4px 20px 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         .modal-detail-row {
             display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            font-size: 14px;
-            color: #333;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            color: #1e293b;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
         .modal-detail-row.highlight-row {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #d32f2f;
+            background: rgba(255, 255, 255, 0.88);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
         .modal-label {
-            font-weight: bold;
-            color: #555;
+            font-weight: 700;
+            color: #475569;
             white-space: nowrap;
-            min-width: 90px;
+            min-width: 92px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .modal-value {
-            font-weight: bold;
-            color: #111;
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 15px;
+            word-break: break-all;
         }
         .modal-value-group {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 16px;
+            word-break: break-all;
+            line-height: 1.35;
+        }
+        .cell-detail-modal-footer {
+            padding: 4px 20px 20px;
+            text-align: center;
+        }
+        .modal-tap-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(15, 23, 42, 0.75);
+            letter-spacing: -0.2px;
+            animation: softPulse 2s infinite ease-in-out;
+        }
+        @keyframes softPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }-value-group {
             font-weight: bold;
             color: #d32f2f;
             font-size: 15px;
@@ -501,10 +550,10 @@
 
     <!-- 셀 상세 정보 확대 팝업 모달 -->
     <div id="cellDetailModal" class="cell-detail-modal-overlay" onclick="closeCellDetailModal(event)">
-        <div class="cell-detail-modal-card" onclick="event.stopPropagation()">
+        <div class="cell-detail-modal-card" id="cellDetailCard" onclick="closeCellDetailModal(event)">
             <div class="cell-detail-modal-header" id="modalHeaderBg">
-                <div id="modalTitle">📌 1교시 (09:30~10:30) - 도시재난</div>
-                <button type="button" class="cell-detail-close-btn" onclick="closeCellDetailModal()">✕</button>
+                <div id="modalTitle" class="modal-header-title">📌 1교시 (09:30~10:30) - 도시재난</div>
+                <button type="button" class="cell-detail-close-btn" onclick="closeCellDetailModal(event)">✕</button>
             </div>
             <div class="cell-detail-modal-body">
                 <div class="modal-detail-row">
@@ -525,7 +574,7 @@
                 </div>
             </div>
             <div class="cell-detail-modal-footer">
-                <button type="button" class="modal-btn-confirm" onclick="closeCellDetailModal()">확인 (닫기)</button>
+                <div class="modal-tap-hint">💡 화면을 다시 터치하면 닫힙니다</div>
             </div>
         </div>
     </div>
@@ -2549,7 +2598,8 @@ function openCellDetailModal(pIdx, cIdx) {
     if (!cellData || !period || !course) return;
 
     const modal = document.getElementById('cellDetailModal');
-    if (!modal) return;
+    const modalCard = document.getElementById('cellDetailCard');
+    if (!modal || !modalCard) return;
 
     const instName = cellData.instructor || "미배정";
     const groupName = cellData.group ? cellData.group.trim() : "개인 / 단체 없음";
@@ -2562,22 +2612,25 @@ function openCellDetailModal(pIdx, cIdx) {
     document.getElementById('modalGroup').innerText = groupName;
     document.getElementById('modalCount').innerText = countVal;
 
-    const groupColor = isCanceled ? '#757575' : getGroupColor(cellData.group);
-    const headerBg = document.getElementById('modalHeaderBg');
-    if (headerBg) {
-        if (groupColor && groupColor !== 'transparent' && groupColor !== '#ffffff') {
-            headerBg.style.backgroundColor = groupColor;
-            headerBg.style.color = '#111';
-        } else {
-            headerBg.style.backgroundColor = '#d32f2f';
-            headerBg.style.color = '#fff';
-        }
+    let groupColor = isCanceled ? '#e2e8f0' : getGroupColor(cellData.group);
+    if (!groupColor || groupColor === 'transparent' || groupColor === '#ffffff') {
+        groupColor = '#ffffff';
+    }
+
+    // 모달 전체 카드 배경색을 단체명 색상과 동일하게 설정
+    modalCard.style.backgroundColor = groupColor;
+
+    // 수업 취소 또는 어두운 배경일 때 텍스트 조절
+    if (isCanceled || groupColor === '#757575') {
+        modalCard.style.color = '#1e293b';
+    } else {
+        modalCard.style.color = '#0f172a';
     }
 
     const sproutRow = document.getElementById('modalSproutRow');
     if (cellData.sproutTime && sproutRow) {
         sproutRow.style.display = 'flex';
-        document.getElementById('modalSproutTime').innerText = `🕐 ${cellData.sproutTime} 시작`;
+        document.getElementById('modalSproutTime').innerText = `${cellData.sproutTime} 시작`;
     } else if (sproutRow) {
         sproutRow.style.display = 'none';
     }
@@ -2586,11 +2639,7 @@ function openCellDetailModal(pIdx, cIdx) {
 }
 
 function closeCellDetailModal(event) {
-    if (event && event.target) {
-        const isOverlay = event.target.classList.contains('cell-detail-modal-overlay');
-        const isBtn = event.target.classList.contains('modal-btn-confirm') || event.target.classList.contains('cell-detail-close-btn');
-        if (!isOverlay && !isBtn) return;
-    }
+    // 확인 버튼이 없어도 화면 어느 곳이든 한번 더 터치하면 팝업 닫힘
     const modal = document.getElementById('cellDetailModal');
     if (modal) modal.classList.remove('active');
 }
