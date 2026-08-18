@@ -1,5 +1,5 @@
 // 서비스 워커 (Service Worker) - 최신 파일 우선(Network-First) 적용
-const CACHE_NAME = '119-schedule-v21';
+const CACHE_NAME = '119-schedule-v24';
 const urlsToCache = [
     './',
     './index.html',

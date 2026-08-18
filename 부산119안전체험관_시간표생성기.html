@@ -97,6 +97,80 @@
         
         .stat-num-input { width: 50px; text-align: center; padding: 2px; border: 1px solid #ccc; border-radius: 3px; }
         .special-user { background-color: #fff3cd; }
+        /* ====================================================
+           [앱 모드(.apk/PWA) vs 웹 브라우저(홈페이지) 분리 스타일]
+           ==================================================== */
+        .web-mode-only { display: flex; }
+        .app-mode-only { display: none !important; }
+
+        body.app-mode {
+            padding: 8px 6px !important;
+            background-color: #f1f3f5 !important;
+        }
+
+        body.app-mode .container {
+            padding: 12px 8px !important;
+            border-radius: 10px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+        }
+
+        body.app-mode .web-mode-only {
+            display: none !important;
+        }
+
+        body.app-mode .app-mode-only {
+            display: flex !important;
+        }
+
+        .app-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(211,47,47,0.3);
+        }
+
+        .app-nav-title {
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-mode-badge {
+            font-size: 10px;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: normal;
+        }
+
+        body.app-mode .tab-btn {
+            padding: 8px 10px !important;
+            font-size: 12.5px !important;
+            border-radius: 6px 6px 0 0 !important;
+        }
+
+        .web-app-link-badge {
+            font-size: 11px;
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #c8e6c9;
+            padding: 4px 10px;
+            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
+        }
+    </style>
+    <style>
         .seomu-user { background-color: #e3f2fd; }
 
         .editable-inst { width: 85%; font-weight: bold; text-align: center; border: 1px solid #adb5bd; border-radius: 3px; padding: 2px; background-color: #ffffff; }
@@ -107,6 +181,8 @@
         
         .sprout-dates-box { font-size: 11px; color: #1b5e20; background: #e8f5e9; padding: 4px 8px; border-radius: 4px; text-align: left; word-break: break-all; }
         .cell-group-tag { font-size: 11px; color: #212529; font-weight: bold; margin-top: 2px; padding: 2px 4px; border-radius: 3px; display: inline-block; }
+        .editable-group { width: 90%; padding: 2px 4px; font-size: 11px; font-weight: bold; color: #111; background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(0,0,0,0.2); border-radius: 4px; text-align: center; margin-top: 2px; }
+        .editable-group:hover, .editable-group:focus { background: #ffffff; border-color: #d32f2f; outline: none; }
         
         /* 교수요원별 배정 수 요약 스타일 */
         .summary-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; }
@@ -209,10 +285,26 @@
 </head>
 <body>
 <div class="container">
-    <h1>🚒 부산119안전체험관 맞춤형 시간표 생성기</h1>
-    <p class="subtitle">출근 현황, 당일 조건 및 새싹안전마을 우선배정 데이터를 바탕으로 시간표를 자동 배정합니다.
-        <span id="syncStatusBadge" class="info-badge" style="margin-left:8px;">⏳ 연결 중...</span>
-    </p>
+    <!-- 웹 브라우저(홈페이지) 전용 헤더 -->
+    <div class="web-mode-only" style="flex-direction:column; margin-bottom:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h1 style="margin:0;">🚒 부산119안전체험관 맞춤형 시간표 생성기</h1>
+            <span class="web-app-link-badge">💻 웹 브라우저 모드 | 📱 APK 어플 지원</span>
+        </div>
+        <p class="subtitle" style="margin-top:5px; margin-bottom:0;">
+            출근 현황, 당일 조건 및 새싹안전마을 우선배정 데이터를 바탕으로 시간표를 자동 배정합니다.
+            <span id="syncStatusBadge" class="info-badge" style="margin-left:8px;">⏳ 연결 중...</span>
+        </p>
+    </div>
+
+    <!-- 앱 모드(.apk/PWA) 전용 스마트폰 헤더 -->
+    <div class="app-mode-only app-nav-bar">
+        <div class="app-nav-title">
+            <span>🚒 119 시간표 앱</span>
+            <span class="app-mode-badge">📱 어플 모드</span>
+        </div>
+        <span id="syncStatusBadgeApp" class="info-badge" style="background:rgba(255,255,255,0.9); color:#111; font-weight:bold; font-size:11px;">🟢 연결됨</span>
+    </div>
 
     <!-- 탭 내비게이션 -->
     <div class="tab-menu">
@@ -2184,21 +2276,37 @@ function initFirebaseSync(onReady) {
 
 function updateSyncStatusBadge(state) {
     const badge = document.getElementById('syncStatusBadge');
-    if (!badge || !badge.style) return;
+    const badgeApp = document.getElementById('syncStatusBadgeApp');
+    let text = '', color = '', bg = '';
     if (state === 'online') {
-        badge.innerText = '🟢 실시간 동기화 완료';
-        badge.style.color = '#1b5e20';
-        badge.style.backgroundColor = '#e8f5e9';
+        text = '🟢 실시간 동기화 완료'; color = '#1b5e20'; bg = '#e8f5e9';
     } else if (state === 'connecting') {
-        badge.innerText = '⏳ 동기화 중...';
-        badge.style.color = '#0d47a1';
-        badge.style.backgroundColor = '#e3f2fd';
+        text = '⏳ 동기화 중...'; color = '#0d47a1'; bg = '#e3f2fd';
     } else {
-        badge.innerText = '🟢 정상 작동 중 (로컬 저장소 자동 동기화)';
-        badge.style.color = '#1b5e20';
-        badge.style.backgroundColor = '#e8f5e9';
+        text = '🟢 정상 작동 중 (로컬 동기화)'; color = '#1b5e20'; bg = '#e8f5e9';
+    }
+    if (badge && badge.style) {
+        badge.innerText = text; badge.style.color = color; badge.style.backgroundColor = bg;
+    }
+    if (badgeApp && badgeApp.style) {
+        badgeApp.innerText = text; badgeApp.style.color = color; badgeApp.style.backgroundColor = bg;
     }
 }
+
+function initAppDisplayMode() {
+    const isApp = window.matchMedia('(display-mode: standalone)').matches || 
+                  window.navigator.standalone === true || 
+                  document.referrer.includes('android-app://');
+    
+    if (isApp) {
+        document.body.classList.add('app-mode');
+        document.body.classList.remove('web-mode');
+    } else {
+        document.body.classList.add('web-mode');
+        document.body.classList.remove('app-mode');
+    }
+}
+window.addEventListener('DOMContentLoaded', initAppDisplayMode);
 
 function applyRemoteData(data) {
     if (data.instructors) instructors = data.instructors;
@@ -2380,7 +2488,7 @@ function initBookingTable() {
                             <label class="chk-label">
                                 <input type="checkbox" class="booking-chk" data-p="${pIdx}" data-c="${cIdx}" checked onchange="onBookingChange()"> 개설
                             </label>
-                            <input type="text" class="group-input" data-p="${pIdx}" data-c="${cIdx}" placeholder="단체명" onkeyup="updateGroupCellColors()">
+                            <input type="text" class="group-input" data-p="${pIdx}" data-c="${cIdx}" placeholder="단체명" onkeyup="updateGroupCellColors()" oninput="updateGroupCellColors()" onchange="updateGroupCellColors()">
                             <input type="number" class="count-input" data-p="${pIdx}" data-c="${cIdx}" placeholder="인원(명)" min="0" value="20">
                         </div>
                     </td>
@@ -2511,6 +2619,9 @@ function getGroupColor(groupName) {
 /* [요구사항 1 수정] 표의 셀(td) 전체 배경색 적용 및 나중에 적어도 시간표/통계/엑셀과 실시간 100% 연동 */
 function updateGroupCellColors() {
     let updatedSchedule = false;
+    if (lastGeneratedSchedule) {
+        lastGeneratedSchedule = normalizeScheduleResult(lastGeneratedSchedule);
+    }
     const groupInputs = document.querySelectorAll('.group-input');
     groupInputs.forEach(input => {
         const val = input.value.trim();
@@ -2528,7 +2639,7 @@ function updateGroupCellColors() {
         }
 
         if (lastGeneratedSchedule && lastGeneratedSchedule[pIdx] && lastGeneratedSchedule[pIdx][cIdx]) {
-            if (lastGeneratedSchedule[pIdx][cIdx].group !== val) {
+            if ((lastGeneratedSchedule[pIdx][cIdx].group || "") !== val) {
                 lastGeneratedSchedule[pIdx][cIdx].group = val;
                 updatedSchedule = true;
             }
@@ -3537,6 +3648,14 @@ function loadDateSchedule(dateStr) {
     const emsCourseIdx = courses.findIndex(c => c.name === "구급출동");
     
     if (savedData) {
+        if (savedData.scheduleResult) {
+            lastGeneratedSchedule = normalizeScheduleResult(savedData.scheduleResult);
+            lastGeneratedScheduleDate = dateStr;
+        } else {
+            lastGeneratedSchedule = null;
+            lastGeneratedScheduleDate = null;
+        }
+
         if (savedData.bookings) {
             standardPeriods.forEach((p, pIdx) => {
                 courses.forEach((c, cIdx) => {
@@ -3579,13 +3698,9 @@ function loadDateSchedule(dateStr) {
             });
         }
 
-        if (savedData && savedData.scheduleResult) {
-            lastGeneratedSchedule = savedData.scheduleResult;
-            lastGeneratedScheduleDate = dateStr;
-            renderScheduleTable(savedData.scheduleResult);
+        if (lastGeneratedSchedule) {
+            renderScheduleTable(lastGeneratedSchedule);
         } else {
-            lastGeneratedSchedule = null;
-            lastGeneratedScheduleDate = null;
             document.getElementById('result').innerHTML = "";
         }
 
@@ -3798,14 +3913,27 @@ function generateSchedule(forceRegenerate = true) {
         }
     }
 
-    lastGeneratedSchedule = bestScheduleMap;
+    lastGeneratedSchedule = normalizeScheduleResult(bestScheduleMap);
     lastGeneratedScheduleDate = dateStr;
+
+    // 상단 세부설정(booking-table)의 단체명과 인원을 생성된 시간표 셀에 100% 동기화
+    standardPeriods.forEach((p, pIdx) => {
+        courses.forEach((c, cIdx) => {
+            const gInput = document.querySelector(`.group-input[data-p="${pIdx}"][data-c="${cIdx}"]`);
+            const cInput = document.querySelector(`.count-input[data-p="${pIdx}"][data-c="${cIdx}"]`);
+            if (lastGeneratedSchedule && lastGeneratedSchedule[pIdx] && lastGeneratedSchedule[pIdx][cIdx]) {
+                if (gInput) lastGeneratedSchedule[pIdx][cIdx].group = gInput.value.trim();
+                if (cInput) lastGeneratedSchedule[pIdx][cIdx].count = parseInt(cInput.value) || 0;
+            }
+        });
+    });
+
     if (dateStr) {
         if (!dailySchedules[dateStr]) dailySchedules[dateStr] = {};
-        dailySchedules[dateStr].scheduleResult = bestScheduleMap;
+        dailySchedules[dateStr].scheduleResult = lastGeneratedSchedule;
         saveCurrentDateData();
     }
-    renderScheduleTable(bestScheduleMap);
+    renderScheduleTable(lastGeneratedSchedule);
     recordSproutAssignments(bestScheduleMap);
     recalculateMonthlyStats();
 
@@ -4151,7 +4279,9 @@ function normalizeScheduleResult(sr) {
 
 
 function renderScheduleTable(scheduleMap) {
+    scheduleMap = normalizeScheduleResult(scheduleMap);
     let resultDiv = document.getElementById("result");
+    if (!resultDiv || !scheduleMap) return;
     let html = `
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
             <h3 style="margin:0;">🗓️ 생성된 일일 체험 시간표</h3>
@@ -4183,7 +4313,8 @@ function renderScheduleTable(scheduleMap) {
                     style += " text-decoration:line-through; color:#888;";
                 }
 
-                let groupColor = isCanceled ? '#f5f5f5' : getGroupColor(cellData.group);
+                let groupNameVal = cellData.group || "";
+                let groupColor = isCanceled ? '#f5f5f5' : getGroupColor(groupNameVal);
                 let cancelBtnText = isCanceled ? '복구' : '취소';
                 let cancelBtnStyle = isCanceled ? 'background:#e0e0e0; color:#333;' : 'background:#ffebee; color:#c62828;';
 
@@ -4191,7 +4322,9 @@ function renderScheduleTable(scheduleMap) {
                     ${isCanceled ? '<div style="font-size:10px; color:#c62828; font-weight:bold; margin-bottom:2px;">🚫 [수업 취소됨]</div>' : ''}
                     <input type="text" class="editable-inst" value="${instName}" style="${style}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'instructor', this.value)" onmouseenter="highlightInstructorCells(this.value)" onmouseleave="clearInstructorHighlight()" onfocus="highlightInstructorCells(this.value)" onblur="clearInstructorHighlight()">
                     ${cellData.sproutTime ? `<div class="cell-group-tag mobile-hide-btn" style="background:#e8f5e9; color:#1b5e20; ${isCanceled ? 'opacity:0.5;' : ''}">🕐 ${cellData.sproutTime}</div>` : ''}
-                    ${cellData.group ? `<div class="cell-group-tag" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}">${cellData.group}</div>` : ''}
+                    <div style="margin-top:2px;">
+                        <input type="text" class="editable-group" value="${groupNameVal}" placeholder="단체명" style="${isCanceled ? 'text-decoration:line-through; opacity:0.5;' : ''}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'group', this.value)">
+                    </div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:2px; margin-top:2px;">
                         <span style="${isCanceled ? 'text-decoration:line-through; opacity:0.6;' : ''}"><input type="number" class="editable-count" value="${cellData.count}" onchange="updateScheduleCell(${pIdx}, ${cIdx}, 'count', this.value)">명</span>
                         <button type="button" class="mobile-hide-btn" onclick="toggleScheduleCellCancel(${pIdx}, ${cIdx})" style="padding:2px 5px; font-size:10px; font-weight:bold; cursor:pointer; border:1px solid #ccc; border-radius:3px; ${cancelBtnStyle}">${cancelBtnText}</button>
@@ -4257,11 +4390,21 @@ function toggleScheduleCellCancel(pIdx, cIdx) {
 
 function updateScheduleCell(pIdx, cIdx, field, value) {
     if (lastGeneratedSchedule && lastGeneratedSchedule[pIdx] && lastGeneratedSchedule[pIdx][cIdx]) {
-        if (field === 'count') value = parseInt(value) || 0;
+        if (field === 'count') {
+            value = parseInt(value) || 0;
+        } else if (field === 'group') {
+            value = (value || "").trim();
+            const gInput = document.querySelector(`.group-input[data-p="${pIdx}"][data-c="${cIdx}"]`);
+            if (gInput) gInput.value = value;
+        }
         lastGeneratedSchedule[pIdx][cIdx][field] = value;
         rebuildSproutMonthlyRecordsAll();
         renderSproutMonthlyTable();
         recalculateMonthlyStats();
+        if (field === 'group') {
+            updateGroupCellColors();
+            renderScheduleTable(lastGeneratedSchedule);
+        }
     }
 }
 
